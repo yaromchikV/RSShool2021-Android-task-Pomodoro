@@ -13,6 +13,9 @@ It's fine :dog::fire:. Но хорошая новость в том, что ес
 
 [См. видео на youtube](https://youtu.be/4fpBxq3mxa0)
 
+
+## Описание задания
+
 Один экран. На экране список RecyclerView и форма для создания таймера. Элемент списка - созданный таймер:
 
 <img alt="Pomodoro screen" src="/img/pomodoro_screen.png" width="400"/>
