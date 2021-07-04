@@ -44,7 +44,7 @@ It's fine :dog::fire:. Но хорошая новость в том, что ес
 
 Если вам показалось, что задание слишком сложное для вашего уровня - не переживайте! Будет три примера исходниками - создание RecyclerView с таймером, создание Custom View и создание Foreground Service c Notification. Останется объединить все это в одном проекте.
 
-
+ 
 ## Cross-checking
 
 - Изучите требования к <a href="https://docs.rs.school/#/cross-check-flow?id=cross-check">cross-check</a>
