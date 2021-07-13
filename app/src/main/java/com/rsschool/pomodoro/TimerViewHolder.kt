@@ -2,6 +2,7 @@ package com.rsschool.pomodoro
 
 import android.graphics.drawable.AnimationDrawable
 import android.os.CountDownTimer
+import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.recyclerview.widget.RecyclerView
 import com.rsschool.pomodoro.databinding.TimerItemBinding
@@ -12,30 +13,34 @@ class TimerViewHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var countDownTimer: CountDownTimer? = null
+    private var currentTimeIndicator = 0L
 
-    fun bind(timer: Timer) {
-        binding.timerTime.text = timer.startTime.displayTime()
+    fun bindTo(timer: TimerModel) {
+        binding.timerTime.text = timer.currentMs.displayTime()
 
         if (timer.isStarted)
             startTimer(timer)
         else
             stopTimer(timer)
 
+        binding.timeIndicator.setPeriod(timer.initMs)
+        binding.timeIndicator.setCurrent(timer.initMs - timer.currentMs)
+
         initButtonsListeners(timer)
     }
 
-    private fun initButtonsListeners(timer: Timer) {
+    private fun initButtonsListeners(timer: TimerModel) {
         binding.startPauseButton.setOnClickListener {
             if (timer.isStarted)
-                listener.stop(timer.id, timer.startTime)
+                listener.stop(timer.id, timer.currentMs, timer.initMs)
             else
-                listener.start(timer.id, timer.startTime)
+                listener.start(timer.id, timer.currentMs, timer.initMs)
         }
 
         binding.deleteButton.setOnClickListener { listener.delete(timer.id) }
     }
 
-    private fun startTimer(timer: Timer) {
+    private fun startTimer(timer: TimerModel) {
         binding.startPauseButton.text = "Stop"
 
         countDownTimer?.cancel()
@@ -46,7 +51,7 @@ class TimerViewHolder(
         (binding.blinkingIndicator.background as? AnimationDrawable)?.start()
     }
 
-    private fun stopTimer(timer: Timer) {
+    private fun stopTimer(timer: TimerModel) {
         binding.startPauseButton.text = "Start"
 
         countDownTimer?.cancel()
@@ -55,42 +60,44 @@ class TimerViewHolder(
         (binding.blinkingIndicator.background as? AnimationDrawable)?.stop()
     }
 
-    private fun getCountDownTimer(timer: Timer): CountDownTimer {
-        return object : CountDownTimer(PERIOD, UNIT_ONE_S) {
+    private fun getCountDownTimer(timer: TimerModel): CountDownTimer {
+        return object : CountDownTimer(timer.initMs, INTERVAL) {
 
             override fun onTick(millisUntilFinished: Long) {
-                timer.startTime -= UNIT_ONE_S
-                binding.timerTime.text = timer.startTime.displayTime()
+                if (timer.currentMs - INTERVAL < 0)
+                    onFinish()
+
+                timer.currentMs -= INTERVAL
+                binding.timerTime.text = timer.currentMs.displayTime()
+
+                currentTimeIndicator += INTERVAL
+                binding.timeIndicator.setCurrent(currentTimeIndicator)
             }
 
             override fun onFinish() {
-                binding.timerTime.text = timer.startTime.displayTime()
-            }
+                stopTimer(timer)
 
+                binding.timeIndicator.setCurrent(0)
+                binding.startPauseButton.text = "Repeat"
+                binding.timerTime.text = timer.initMs.displayTime()
+
+                timer.isStarted = false
+                timer.currentMs = timer.initMs
+            }
         }
     }
 
     private fun Long.displayTime(): String {
-        if (this <= 0L) {
-            return START_TIME
-        }
-        val h = this / 1000 / 3600
-        val m = this / 1000 % 3600 / 60
-        val s = this / 1000 % 60
-
-        return "${displaySlot(h)}:${displaySlot(m)}:${displaySlot(s)}"
-    }
-
-    private fun displaySlot(count: Long): String {
-        return if (count / 10L > 0)
-            "$count"
-        else
-            "0$count"
+        return if (this <= 0L) START_TIME
+        else "%02d:%02d:%02d".format(
+            this / 1000 / 3600,
+            this / 1000 % 3600 / 60,
+            this / 1000 % 60
+        )
     }
 
     private companion object {
         private const val START_TIME = "00:00:00"
-        private const val UNIT_ONE_S = 70L
-        private const val PERIOD = 1000L * 60L * 60L * 24L
+        private const val INTERVAL = 100L
     }
 }

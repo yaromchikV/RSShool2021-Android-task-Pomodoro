@@ -37,9 +37,9 @@ class SetTimeDialog(private val activity: MainActivity) : Dialog(activity) {
             val hours = dialogBinding.numberPickerHours.value
             val minutes = dialogBinding.numberPickerMinutes.value
             val seconds = dialogBinding.numberPickerSeconds.value
-            val startTime = hours * 3600000L + minutes * 60000L + seconds * 1000L
+            val initMs = hours * 3600000L + minutes * 60000L + seconds * 1000L
 
-            activity.add(startTime)
+            activity.add(initMs)
             dismiss()
         }
 

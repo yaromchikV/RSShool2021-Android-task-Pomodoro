@@ -5,4 +5,6 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="set_timer">Set Timer</string>
+    <string name="start">Start</string>
+    <string name="empty">Empty :(</string>
 </resources>

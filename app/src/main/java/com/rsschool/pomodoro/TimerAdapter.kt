@@ -8,7 +8,7 @@ import com.rsschool.pomodoro.databinding.TimerItemBinding
 
 class TimerAdapter(
     private val listener: TimerListener
-) : ListAdapter<Timer, TimerViewHolder>(itemComparator) {
+) : ListAdapter<TimerModel, TimerViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimerViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -17,21 +17,22 @@ class TimerAdapter(
     }
 
     override fun onBindViewHolder(holder: TimerViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bindTo(getItem(position))
     }
 
     private companion object {
-        private val itemComparator = object : DiffUtil.ItemCallback<Timer>() {
-            override fun areItemsTheSame(oldItem: Timer, newItem: Timer): Boolean {
+        private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<TimerModel>() {
+            override fun areItemsTheSame(oldItem: TimerModel, newItem: TimerModel): Boolean {
                 return oldItem.id == newItem.id
             }
 
-            override fun areContentsTheSame(oldItem: Timer, newItem: Timer): Boolean {
-                return oldItem.startTime == newItem.startTime &&
+            override fun areContentsTheSame(oldItem: TimerModel, newItem: TimerModel): Boolean {
+                return oldItem.currentMs == newItem.currentMs &&
+                        oldItem.initMs == newItem.initMs &&
                         oldItem.isStarted == newItem.isStarted
             }
 
-            override fun getChangePayload(oldItem: Timer, newItem: Timer) = Any()
+            override fun getChangePayload(oldItem: TimerModel, newItem: TimerModel) = Any()
         }
     }
 }
