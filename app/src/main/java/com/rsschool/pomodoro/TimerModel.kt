@@ -2,7 +2,8 @@ package com.rsschool.pomodoro
 
 data class TimerModel(
     val id: Int,
-    var currentMs: Long,
+    val label: String,
     var initMs: Long,
+    var currentMs: Long,
     var isStarted: Boolean
 )

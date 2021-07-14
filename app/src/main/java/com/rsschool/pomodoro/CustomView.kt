@@ -44,15 +44,11 @@ class CustomView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (periodMs == 0L || currentMs == 0L) return
-        val startAngle = (((currentMs % periodMs).toFloat() / periodMs) * 360)
+        val angle = (((currentMs % periodMs).toFloat() / periodMs) * 360)
 
         canvas.drawArc(
-            0f,
-            0f,
-            width.toFloat(),
-            height.toFloat(),
-            -90f,
-            startAngle,
+            0f, 0f, width.toFloat(), height.toFloat(),
+            -90f, angle,
             true,
             paint
         )

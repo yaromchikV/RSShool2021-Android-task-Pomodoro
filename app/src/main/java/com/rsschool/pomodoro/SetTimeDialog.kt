@@ -1,6 +1,7 @@
 package com.rsschool.pomodoro
 
 import android.app.Dialog
+import android.util.Log
 import com.rsschool.pomodoro.databinding.DialogTimeBinding
 
 class SetTimeDialog(private val activity: MainActivity) : Dialog(activity) {
@@ -39,7 +40,9 @@ class SetTimeDialog(private val activity: MainActivity) : Dialog(activity) {
             val seconds = dialogBinding.numberPickerSeconds.value
             val initMs = hours * 3600000L + minutes * 60000L + seconds * 1000L
 
-            activity.add(initMs)
+            val label = dialogBinding.labelName.editText?.text.toString()
+
+            activity.add(initMs, label)
             dismiss()
         }
 
