@@ -10,7 +10,7 @@ import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.RequiresApi
 
-class CustomView @JvmOverloads constructor(
+class ProgressBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0
@@ -44,7 +44,7 @@ class CustomView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (periodMs == 0L || currentMs == 0L) return
-        val angle = (((currentMs % periodMs).toFloat() / periodMs) * 360)
+        val angle = ((currentMs % periodMs).toFloat() / periodMs) * 360
 
         canvas.drawArc(
             0f, 0f, width.toFloat(), height.toFloat(),

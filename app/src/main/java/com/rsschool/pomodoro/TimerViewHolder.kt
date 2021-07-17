@@ -1,5 +1,6 @@
 package com.rsschool.pomodoro
 
+import android.content.res.Resources
 import android.graphics.drawable.AnimationDrawable
 import android.os.CountDownTimer
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -11,12 +12,13 @@ import com.rsschool.pomodoro.databinding.TimerItemBinding
 class TimerViewHolder(
     private val binding: TimerItemBinding,
     private val listener: TimerListener,
-    private var countDownTimer: CountDownTimer?,
-    private var progressBarPosition: Long
+    private val resources: Resources
 ) : RecyclerView.ViewHolder(binding.root) {
 
+    private var countDownTimer: CountDownTimer? = null
+
     fun update(timer: TimerModel) {
-        binding.timerTime.text = timer.currentMs.displayTime()
+        binding.timerTime.text = (timer.initTime - timer.operationTime).displayTime()
 
         if (timer.isStarted)
             startTimer(timer)
@@ -42,9 +44,8 @@ class TimerViewHolder(
     }
 
     private fun updateCustomView(timer: TimerModel) {
-        binding.progressBar.setPeriod(timer.initMs)
-        progressBarPosition = timer.initMs - timer.currentMs
-        binding.progressBar.setCurrent(progressBarPosition)
+        binding.progressBar.setPeriod(timer.initTime)
+        binding.progressBar.setCurrent(timer.operationTime)
     }
 
     private fun initButtonsListeners(timer: TimerModel) {
@@ -63,7 +64,7 @@ class TimerViewHolder(
         countDownTimer = getCountDownTimer(timer)
         countDownTimer?.start()
 
-        binding.startPauseButton.text = "Stop"
+        binding.startPauseButton.text = resources.getString(R.string.stop)
 
         binding.blinkingIndicator.isInvisible = false
         (binding.blinkingIndicator.background as? AnimationDrawable)?.start()
@@ -72,48 +73,39 @@ class TimerViewHolder(
     private fun stopTimer(timer: TimerModel) {
         countDownTimer?.cancel()
 
-        binding.startPauseButton.text = "Start"
+        binding.startPauseButton.text = resources.getString(R.string.start)
 
         binding.blinkingIndicator.isInvisible = true
         (binding.blinkingIndicator.background as? AnimationDrawable)?.stop()
     }
 
+    private var runningTime = 0L
+
     private fun getCountDownTimer(timer: TimerModel): CountDownTimer {
-        return object : CountDownTimer(timer.initMs, INTERVAL) {
+        return object : CountDownTimer(timer.initTime, INTERVAL) {
 
             override fun onTick(millisUntilFinished: Long) {
-                timer.currentMs -= INTERVAL
-                binding.timerTime.text = timer.currentMs.displayTime()
-
-                progressBarPosition += INTERVAL
-                binding.progressBar.setCurrent(progressBarPosition)
-
-                if (timer.currentMs - INTERVAL < 0)
-                    onFinish()
+                if (timer.isStarted) {
+                    runningTime = System.currentTimeMillis() - timer.startTime + timer.operationTime
+                    if (runningTime > timer.initTime)
+                        onFinish()
+                    else {
+                        binding.timerTime.text = (timer.initTime - runningTime).displayTime()
+                        binding.progressBar.setCurrent(runningTime)
+                    }
+                }
             }
 
             override fun onFinish() {
+                stopTimer(timer)
                 timer.apply {
-                    currentMs = timer.initMs
+                    startTime = 0
+                    operationTime = 0
                     isStarted = false
                 }
-                binding.timerTime.text = timer.initMs.displayTime()
-                stopTimer(timer)
+                binding.timerTime.text = timer.initTime.displayTime()
+                binding.progressBar.setCurrent(timer.initTime)
             }
         }
-    }
-
-    private fun Long.displayTime(): String {
-        return if (this <= 0L) START_TIME
-        else "%02d:%02d:%02d".format(
-            this / 1000 / 3600,
-            this / 1000 % 3600 / 60,
-            this / 1000 % 60
-        )
-    }
-
-    private companion object {
-        private const val START_TIME = "00:00:00"
-        private const val INTERVAL = 100L
     }
 }

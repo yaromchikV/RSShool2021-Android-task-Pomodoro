@@ -1,22 +1,18 @@
 package com.rsschool.pomodoro
 
-import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.rsschool.pomodoro.databinding.TimerItemBinding
-import kotlin.concurrent.timer
 
 class TimerAdapter(private val listener: TimerListener) :
     ListAdapter<TimerModel, TimerViewHolder>(DIFF_CALLBACK) {
 
-    private var countDownTimer: CountDownTimer? = null
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TimerViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding = TimerItemBinding.inflate(layoutInflater, parent, false)
-        return TimerViewHolder(binding, listener, countDownTimer, 0L)
+        return TimerViewHolder(binding, listener, binding.root.resources)
     }
 
     override fun onBindViewHolder(holder: TimerViewHolder, position: Int) {
@@ -30,8 +26,10 @@ class TimerAdapter(private val listener: TimerListener) :
             }
 
             override fun areContentsTheSame(oldItem: TimerModel, newItem: TimerModel): Boolean {
-                return oldItem.currentMs == newItem.currentMs &&
-                        oldItem.initMs == newItem.initMs &&
+                return oldItem.label == newItem.label &&
+                        oldItem.initTime == newItem.initTime &&
+                        oldItem.startTime == newItem.startTime &&
+                        oldItem.operationTime == newItem.operationTime &&
                         oldItem.isStarted == newItem.isStarted
             }
 
