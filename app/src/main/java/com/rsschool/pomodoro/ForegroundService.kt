@@ -40,7 +40,7 @@ class ForegroundService : Service() {
 
                 commandStart(label, initTime, startTime, operationTime)
             }
-            COMMAND_STOP -> commandStop(false)
+            COMMAND_STOP -> commandStop()
             INVALID -> return
         }
     }
@@ -112,8 +112,11 @@ class ForegroundService : Service() {
                     )
                     delay(INTERVAL)
                 } else {
+                    notificationManager?.notify(
+                        NOTIFICATION_ID,
+                        getNotification(label, "Time's up (${initTime.displayTime()})")
+                    )
                     turnOnSoundAndVibration()
-                    commandStop(true)
                     break
                 }
             }
@@ -146,7 +149,7 @@ class ForegroundService : Service() {
         }
     }
 
-    private fun commandStop(leaveItStarted: Boolean) {
+    private fun commandStop() {
         if (!isServiceStarted)
             return
         try {
@@ -154,8 +157,7 @@ class ForegroundService : Service() {
             stopForeground(true)
             stopSelf()
         } finally {
-            if (!leaveItStarted)
-                isServiceStarted = false
+            isServiceStarted = false
         }
     }
 
