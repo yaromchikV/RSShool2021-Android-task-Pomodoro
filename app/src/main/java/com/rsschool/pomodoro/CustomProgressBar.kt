@@ -10,7 +10,7 @@ import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.RequiresApi
 
-class ProgressBar @JvmOverloads constructor(
+class CustomProgressBar @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     @AttrRes defStyleAttr: Int = 0
@@ -38,6 +38,7 @@ class ProgressBar @JvmOverloads constructor(
         paint.color = color
         paint.style = if (style == FILL) Paint.Style.FILL else Paint.Style.STROKE
         paint.strokeWidth = 5F
+
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -48,7 +49,7 @@ class ProgressBar @JvmOverloads constructor(
 
         canvas.drawArc(
             0f, 0f, width.toFloat(), height.toFloat(),
-            -90f, angle,
+            -90f, -angle,
             true,
             paint
         )

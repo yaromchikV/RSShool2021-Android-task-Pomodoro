@@ -30,7 +30,7 @@ class TimerAdapter(private val listener: TimerListener) :
                         oldItem.initTime == newItem.initTime &&
                         oldItem.startTime == newItem.startTime &&
                         oldItem.operationTime == newItem.operationTime &&
-                        oldItem.isStarted == newItem.isStarted
+                        oldItem.status == newItem.status
             }
 
             override fun getChangePayload(oldItem: TimerModel, newItem: TimerModel) = Any()

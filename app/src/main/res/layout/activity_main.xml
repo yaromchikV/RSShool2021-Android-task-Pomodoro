@@ -15,10 +15,9 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         app:layout_constraintBottom_toTopOf="@id/add_new_timer_button"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
         tools:listitem="@layout/timer_item" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
@@ -27,9 +26,11 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="@string/add_timer"
+        android:textAlignment="center"
         android:textColor="@color/white"
         app:backgroundTint="@color/red_500"
         app:icon="@drawable/ic_baseline_add_24"
+        app:iconGravity="textStart"
         app:iconTint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,12 +40,21 @@
         android:id="@+id/clickMeImage"
         android:layout_width="409dp"
         android:layout_height="541dp"
-        android:padding="30dp"
         android:alpha="0.05"
+        android:padding="30dp"
         android:src="@drawable/click_me"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
+    <View
+        android:id="@+id/divider2"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="@color/red_700"
+        android:elevation="1dp"
+        app:layout_constraintBottom_toBottomOf="@+id/recyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,5 +6,9 @@ data class TimerModel(
     var initTime: Long,
     var startTime: Long,
     var operationTime: Long,
-    var isStarted: Boolean
+    var status: TimerStatus
 )
+
+enum class TimerStatus {
+    ACTIVE, STOPPED, FINISHED
+}

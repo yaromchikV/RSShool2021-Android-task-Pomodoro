@@ -1,12 +1,15 @@
 package com.rsschool.pomodoro
 
 import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import com.rsschool.pomodoro.databinding.DialogTimeBinding
 
 class SetTimeDialog(private val activity: MainActivity) : Dialog(activity) {
     private val dialogBinding = DialogTimeBinding.inflate(activity.layoutInflater)
 
     init {
+        window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         setContentView(dialogBinding.root)
 
         val listOf24 = createFilledArray(24)

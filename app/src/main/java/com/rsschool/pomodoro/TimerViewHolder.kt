@@ -1,9 +1,13 @@
 package com.rsschool.pomodoro
 
 import android.content.res.Resources
+import android.graphics.Color
 import android.graphics.drawable.AnimationDrawable
 import android.os.CountDownTimer
+import android.os.SystemClock
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -20,9 +24,9 @@ class TimerViewHolder(
     fun update(timer: TimerModel) {
         binding.timerTime.text = (timer.initTime - timer.operationTime).displayTime()
 
-        if (timer.isStarted)
+        if (timer.status == TimerStatus.ACTIVE)
             startTimer(timer)
-        else
+        else if (timer.status == TimerStatus.STOPPED)
             stopTimer(timer)
 
         updateCardView(timer)
@@ -31,6 +35,11 @@ class TimerViewHolder(
     }
 
     private fun updateCardView(timer: TimerModel) {
+        if (timer.status != TimerStatus.FINISHED)
+            binding.timerItem.background = Color.WHITE.toDrawable()
+        else binding.timerItem.background =
+            ContextCompat.getDrawable((listener as MainActivity).applicationContext, R.color.pink)
+
         val params = binding.timerTime.layoutParams as ConstraintLayout.LayoutParams
         if (timer.label == "") {
             binding.timerLabel.isVisible = false
@@ -50,7 +59,7 @@ class TimerViewHolder(
 
     private fun initButtonsListeners(timer: TimerModel) {
         binding.startPauseButton.setOnClickListener {
-            if (timer.isStarted)
+            if (timer.status == TimerStatus.ACTIVE)
                 listener.stop(timer.id)
             else
                 listener.start(timer.id)
@@ -65,7 +74,6 @@ class TimerViewHolder(
         countDownTimer?.start()
 
         binding.startPauseButton.text = resources.getString(R.string.stop)
-
         binding.blinkingIndicator.isInvisible = false
         (binding.blinkingIndicator.background as? AnimationDrawable)?.start()
     }
@@ -74,26 +82,24 @@ class TimerViewHolder(
         countDownTimer?.cancel()
 
         binding.startPauseButton.text = resources.getString(R.string.start)
-
         binding.blinkingIndicator.isInvisible = true
         (binding.blinkingIndicator.background as? AnimationDrawable)?.stop()
     }
 
-    private var runningTime = 0L
-
     private fun getCountDownTimer(timer: TimerModel): CountDownTimer {
-        return object : CountDownTimer(timer.initTime, INTERVAL) {
+        return object :
+            CountDownTimer((timer.initTime - timer.operationTime + INTERVAL), INTERVAL) {
 
             override fun onTick(millisUntilFinished: Long) {
-                if (timer.isStarted) {
-                    runningTime = System.currentTimeMillis() - timer.startTime + timer.operationTime
+                if (timer.status != TimerStatus.STOPPED) {
+                    val runningTime = SystemClock.elapsedRealtime() - timer.startTime + timer.operationTime
                     if (runningTime > timer.initTime)
                         onFinish()
                     else {
                         binding.timerTime.text = (timer.initTime - runningTime).displayTime()
                         binding.progressBar.setCurrent(runningTime)
                     }
-                }
+                } else countDownTimer?.cancel()
             }
 
             override fun onFinish() {
@@ -101,10 +107,14 @@ class TimerViewHolder(
                 timer.apply {
                     startTime = 0
                     operationTime = 0
-                    isStarted = false
+                    status = TimerStatus.FINISHED
                 }
+
                 binding.timerTime.text = timer.initTime.displayTime()
-                binding.progressBar.setCurrent(timer.initTime)
+                binding.progressBar.setCurrent(0L)
+                binding.timerItem.background = ContextCompat.getDrawable(
+                    (listener as MainActivity).applicationContext, R.color.pink
+                )
             }
         }
     }
