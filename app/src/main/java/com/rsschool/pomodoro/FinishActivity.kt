@@ -61,10 +61,6 @@ class FinishActivity : AppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-    }
-
     override fun onDestroy() {
         vibrator.cancel()
         ringtone.stop()

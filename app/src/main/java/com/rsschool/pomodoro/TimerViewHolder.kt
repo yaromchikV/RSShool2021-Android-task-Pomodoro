@@ -22,7 +22,10 @@ class TimerViewHolder(
     private var countDownTimer: CountDownTimer? = null
 
     fun update(timer: TimerModel) {
-        binding.timerTime.text = (timer.initTime - timer.operationTime).displayTime()
+        binding.timerTime.text =
+            if (timer.status != TimerStatus.FINISHED)
+                (timer.initTime - timer.operationTime).displayTime()
+            else START_TIME
 
         if (timer.status == TimerStatus.ACTIVE)
             startTimer(timer)
@@ -35,10 +38,14 @@ class TimerViewHolder(
     }
 
     private fun updateCardView(timer: TimerModel) {
-        if (timer.status != TimerStatus.FINISHED)
+        if (timer.status != TimerStatus.FINISHED) {
             binding.timerItem.background = Color.WHITE.toDrawable()
-        else binding.timerItem.background =
-            ContextCompat.getDrawable((listener as MainActivity).applicationContext, R.color.pink)
+        } else {
+            binding.timerItem.background = ContextCompat.getDrawable(
+                (listener as MainActivity).applicationContext, R.color.pink
+            )
+            binding.startPauseButton.text = resources.getString(R.string.restart)
+        }
 
         val params = binding.timerTime.layoutParams as ConstraintLayout.LayoutParams
         if (timer.label == "") {
@@ -59,10 +66,15 @@ class TimerViewHolder(
 
     private fun initButtonsListeners(timer: TimerModel) {
         binding.startPauseButton.setOnClickListener {
-            if (timer.status == TimerStatus.ACTIVE)
-                listener.stop(timer.id)
-            else
-                listener.start(timer.id)
+            when (timer.status) {
+                TimerStatus.ACTIVE -> listener.stop(timer.id)
+                TimerStatus.STOPPED -> listener.start(timer.id)
+                TimerStatus.FINISHED -> {
+                    timer.status = TimerStatus.STOPPED
+                    binding.timerTime.text = timer.initTime.displayTime()
+                    update(timer)
+                }
+            }
         }
 
         binding.deleteButton.setOnClickListener { listener.delete(timer.id) }
@@ -92,7 +104,8 @@ class TimerViewHolder(
 
             override fun onTick(millisUntilFinished: Long) {
                 if (timer.status != TimerStatus.STOPPED) {
-                    val runningTime = SystemClock.elapsedRealtime() - timer.startTime + timer.operationTime
+                    val runningTime =
+                        SystemClock.elapsedRealtime() - timer.startTime + timer.operationTime
                     if (runningTime > timer.initTime)
                         onFinish()
                     else {
@@ -110,11 +123,12 @@ class TimerViewHolder(
                     status = TimerStatus.FINISHED
                 }
 
-                binding.timerTime.text = timer.initTime.displayTime()
+                binding.timerTime.text = START_TIME
                 binding.progressBar.setCurrent(0L)
                 binding.timerItem.background = ContextCompat.getDrawable(
                     (listener as MainActivity).applicationContext, R.color.pink
                 )
+                binding.startPauseButton.text = resources.getString(R.string.restart)
             }
         }
     }
