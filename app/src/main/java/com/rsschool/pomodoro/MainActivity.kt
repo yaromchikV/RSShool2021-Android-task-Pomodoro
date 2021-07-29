@@ -59,9 +59,12 @@ class MainActivity : AppCompatActivity(), TimerListener, LifecycleObserver {
     }
 
     override fun delete(id: Int) {
-        timers.remove(timers.find { it.id == id })
+        val index = timers.indexOfFirst { it.id == id }
+        if (activeTimerIndex == index)
+            job?.cancel()
+
+        timers.removeAt(index)
         timerAdapter.submitList(timers.toList())
-        job?.cancel()
 
         if (timers.size == 0) binding.clickMeImage.isVisible = true
     }
